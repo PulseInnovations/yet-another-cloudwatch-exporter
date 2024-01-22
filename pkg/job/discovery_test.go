@@ -370,6 +370,7 @@ func Test_getFilteredMetricDatas(t *testing.T) {
 					Delay:                  120,
 					NilToZero:              aws.Bool(false),
 					AddCloudwatchTimestamp: aws.Bool(false),
+					Integrate:              aws.Bool(true),
 				},
 			},
 			[]model.CloudwatchData{
@@ -393,7 +394,8 @@ func Test_getFilteredMetricDatas(t *testing.T) {
 					Statistics: []string{
 						"Sum",
 					},
-					Tags: []model.Tag{},
+					Tags:      []model.Tag{},
+					Integrate: aws.Bool(true),
 				},
 			},
 		},

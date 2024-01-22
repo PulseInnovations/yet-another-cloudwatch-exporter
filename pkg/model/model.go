@@ -79,6 +79,7 @@ type MetricConfig struct {
 	Delay                  int64
 	NilToZero              *bool
 	AddCloudwatchTimestamp *bool
+	Integrate              *bool
 }
 
 type LabelSet map[string]struct{}
@@ -153,6 +154,7 @@ type CloudwatchData struct {
 	GetMetricDataTimestamps time.Time
 	NilToZero               *bool
 	AddCloudwatchTimestamp  *bool
+	Integrate               *bool
 	Tags                    []Tag
 	Dimensions              []*Dimension
 	Period                  int64

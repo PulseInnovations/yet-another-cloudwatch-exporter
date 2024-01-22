@@ -271,6 +271,7 @@ func getFilteredMetricDatas(
 				Tags:                   metricTags,
 				Dimensions:             cwMetric.Dimensions,
 				Period:                 m.Period,
+				Integrate:              m.Integrate,
 			})
 		}
 	}

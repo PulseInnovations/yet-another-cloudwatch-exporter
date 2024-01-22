@@ -120,6 +120,7 @@ func getMetricDataForQueriesForCustomNamespace(
 							AddCloudwatchTimestamp: metric.AddCloudwatchTimestamp,
 							Dimensions:             cwMetric.Dimensions,
 							Period:                 metric.Period,
+							Integrate:              metric.Integrate,
 						})
 					}
 				}

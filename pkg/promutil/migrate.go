@@ -69,6 +69,10 @@ func BuildMetrics(results []model.CloudwatchMetricResult, labelsSnakeCase bool, 
 				if metric.AddCloudwatchTimestamp != nil {
 					includeTimestamp = *metric.AddCloudwatchTimestamp
 				}
+				var integrate bool
+				if metric.Integrate != nil {
+					integrate = *metric.Integrate
+				}
 				exportedDatapoint, timestamp, err := getDatapoint(metric, statistic)
 				if err != nil {
 					return nil, nil, err
@@ -76,6 +80,7 @@ func BuildMetrics(results []model.CloudwatchMetricResult, labelsSnakeCase bool, 
 				if exportedDatapoint == nil && (metric.AddCloudwatchTimestamp == nil || !*metric.AddCloudwatchTimestamp) {
 					exportedDatapoint = aws.Float64(math.NaN())
 					includeTimestamp = false
+					integrate = false
 					if *metric.NilToZero {
 						exportedDatapoint = aws.Float64(0)
 					}
@@ -103,6 +108,7 @@ func BuildMetrics(results []model.CloudwatchMetricResult, labelsSnakeCase bool, 
 						Value:            exportedDatapoint,
 						Timestamp:        timestamp,
 						IncludeTimestamp: includeTimestamp,
+						Integrate:        integrate,
 					})
 				}
 			}

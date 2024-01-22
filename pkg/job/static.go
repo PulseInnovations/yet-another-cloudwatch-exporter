@@ -34,6 +34,7 @@ func runStaticJob(
 				NilToZero:              metric.NilToZero,
 				AddCloudwatchTimestamp: metric.AddCloudwatchTimestamp,
 				Dimensions:             createStaticDimensions(resource.Dimensions),
+				Integrate:              metric.Integrate,
 			}
 
 			data.Points = clientCloudwatch.GetMetricStatistics(ctx, logger, data.Dimensions, resource.Namespace, metric)

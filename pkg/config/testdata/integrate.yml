@@ -1,0 +1,16 @@
+apiVersion: v1alpha1
+sts-region: us-east-1
+discovery:
+  jobs:
+    - type: AWS/CloudFront
+      regions:
+        - us-east-1
+      period: 300
+      length: 300
+      metrics:
+        - name: Requests
+          statistics: [Sum]
+          integrate: true
+        - name: 5xxErrorRate
+          statistics: [Average]
+      nilToZero: true
