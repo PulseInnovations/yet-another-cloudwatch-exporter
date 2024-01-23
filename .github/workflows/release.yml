@@ -7,7 +7,7 @@ on:
 
 jobs:
   buildDockerImage:
-    if: github.repository == 'nerdswords/yet-another-cloudwatch-exporter'
+    if: github.repository == 'PulseInnovations/yet-another-cloudwatch-exporter'
     name: Build docker image
     runs-on: ubuntu-latest
     steps:
