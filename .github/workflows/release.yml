@@ -12,7 +12,7 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  GORELEASER_VERSION: v1.20.0
+  GORELEASER_VERSION: v1.21.0
 
 permissions:
   contents: write
@@ -51,4 +51,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: release --clean
-
