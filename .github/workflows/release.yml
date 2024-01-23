@@ -12,7 +12,7 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  GORELEASER_VERSION: v1.21.0
+  GORELEASER_VERSION: v1.23.0
 
 permissions:
   contents: write
@@ -54,7 +54,7 @@ jobs:
     name: Container build and push
     needs: build-binary
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     permissions:
       packages: write
       contents: read
