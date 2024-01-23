@@ -1,41 +1,98 @@
-name: Publish Docker image and binaries
+name: Goreleaser
 
 on:
   push:
     tags:
-    - 'v*'
+      - v*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  GORELEASER_VERSION: v1.20.0
+
+permissions:
+  contents: write
 
 jobs:
-  buildDockerImage:
-    if: github.repository == 'PulseInnovations/yet-another-cloudwatch-exporter'
-    name: Build docker image
+  build-binary:
+    name: Build binary using goreleaser
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
-    - uses: actions/checkout@v4
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
 
-    - uses: actions/setup-go@v5
-      with:
-        go-version: ^1.21
+      - name: Set up Go
+        uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
+        with:
+          go-version-file: go.mod
+          check-latest: true
+          cache: true
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
+      - name: Build and release binaries
+        uses: goreleaser/goreleaser-action@7ec5c2b0c6cdda6e8bbb49444bc797dd33d74dd8 # v5.0.0
+        with:
+          distribution: goreleaser
+          version: ${{ env.GORELEASER_VERSION }}
+          args: release --clean --timeout=60m
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Archive generated artifacts
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32
+        with:
+          name: yace-dist-binaries
+          if-no-files-found: error
+          path: |
+            dist
+            !dist/*.txt
+  build-and-push-container:
+    name: Container build and push
+    needs: build-binary
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
 
-    - name: Log into docker
-      env:
-        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        DOCKER_REGISTRY_URL: ghcr.io
-        DOCKER_USERNAME: ${{ github.actor }}
-      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY_URL
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@2b82ce82d56a2a04d2637cd93a637ae1b359c0a7
+        with:
+          platforms: amd64.arm64,arm
 
-    - name: Build and Publish docker image
-      run: docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/nerdswords/yet-another-cloudwatch-exporter:${{github.ref_name}} --build-arg VERSION=${{github.ref_name}} --push .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55
 
-    - name: Build && release binaries
-      uses: goreleaser/goreleaser-action@v5
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        args: release --clean
+      - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a
+        with:
+          name: yace-dist-binaries
+          path: dist
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@0a97817b6ade9f46837855d676c4cca3a2471fc9
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64, linux/arm64
