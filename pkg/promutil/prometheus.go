@@ -97,6 +97,8 @@ type PrometheusMetric struct {
 	Integrate        bool
 }
 
+var counterVecs = make(map[string]*prometheus.CounterVec)
+
 type PrometheusCollector struct {
 	metrics []*PrometheusMetric
 }
@@ -125,11 +127,23 @@ func (p *PrometheusCollector) Collect(metrics chan<- prometheus.Metric) {
 }
 
 func createCounter(metric *PrometheusMetric) prometheus.Metric {
-	counter := prometheus.NewCounter(prometheus.CounterOpts{
-		Name:        *metric.Name + "_count",
-		Help:        "Help is not implemented yet.",
-		ConstLabels: metric.Labels,
-	})
+	counterName := *metric.Name + "_count"
+	counterVec, exists := counterVecs[counterName]
+
+	if !exists {
+		keys := make([]string, 0, len(metric.Labels))
+		for k := range metric.Labels {
+			keys = append(keys, k)
+		}
+		counterVec = prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: counterName,
+			Help: "Help is not implemented yet",
+		}, keys)
+		counterVecs[counterName] = counterVec
+	}
+
+	counter := counterVec.With(metric.Labels)
+
 	counter.Add(*metric.Value)
 	if !metric.IncludeTimestamp {
 		return counter
