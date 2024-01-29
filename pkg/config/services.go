@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/grafana/regexp"
+	"github.com/nerdswords/yet-another-cloudwatch-exporter/pkg/model"
 )
 
 // ServiceConfig defines a namespace supported by discovery jobs.
@@ -22,6 +23,10 @@ type ServiceConfig struct {
 	// In cases where the dimension name has a space, it should be
 	// replaced with an underscore (`_`).
 	DimensionRegexps []*regexp.Regexp
+	// MetricCustomizers is an optional list of functions which transform
+	// the list of metrics returned by Cloudwatch for the given service
+	// before they are returned by the discovery job.
+	MetricCustomizers []func([]*model.CloudwatchData) []*model.CloudwatchData
 }
 
 type serviceConfigs []ServiceConfig
@@ -180,6 +185,14 @@ var SupportedServices = serviceConfigs{
 		},
 		DimensionRegexps: []*regexp.Regexp{
 			regexp.MustCompile("distribution/(?P<DistributionId>[^/]+)"),
+		},
+		MetricCustomizers: []func([]*model.CloudwatchData) []*model.CloudwatchData{
+			func(cloudwatchDatas []*model.CloudwatchData) []*model.CloudwatchData {
+				// TODO: extract counters for successful and failed requests
+				for _, cd := range cloudwatchDatas {
+				}
+				return cloudwatchDatas
+			},
 		},
 	},
 	{

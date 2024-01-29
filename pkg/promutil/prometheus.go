@@ -119,9 +119,10 @@ func (p *PrometheusCollector) Describe(_ chan<- *prometheus.Desc) {
 
 func (p *PrometheusCollector) Collect(metrics chan<- prometheus.Metric) {
 	for _, metric := range p.metrics {
-		metrics <- createMetric(metric)
 		if metric.Integrate {
 			metrics <- createCounter(metric)
+		} else {
+			metrics <- createMetric(metric)
 		}
 	}
 }

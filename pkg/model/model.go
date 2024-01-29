@@ -79,7 +79,6 @@ type MetricConfig struct {
 	Delay                  int64
 	NilToZero              *bool
 	AddCloudwatchTimestamp *bool
-	Integrate              *bool
 }
 
 type LabelSet map[string]struct{}
@@ -154,10 +153,12 @@ type CloudwatchData struct {
 	GetMetricDataTimestamps time.Time
 	NilToZero               *bool
 	AddCloudwatchTimestamp  *bool
-	Integrate               *bool
-	Tags                    []Tag
-	Dimensions              []*Dimension
-	Period                  int64
+	// Integrate bool indicates that the metric should be integrated
+	// into a counter rather than reported as a gauge.
+	Integrate  *bool
+	Tags       []Tag
+	Dimensions []*Dimension
+	Period     int64
 }
 
 // TaggedResource is an AWS resource with tags

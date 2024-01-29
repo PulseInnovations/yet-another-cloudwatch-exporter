@@ -106,6 +106,9 @@ func runDiscoveryJob(
 
 	mapResultsToMetricDatas(getMetricDataOutput, getMetricDatas, logger)
 
+	for _, customizer := range svc.MetricCustomizers {
+		getMetricDatas = customizer(getMetricDatas)
+	}
 	// Remove unprocessed/unknown elements in place, if any. Since getMetricDatas
 	// is a slice of pointers, the compaction can be easily done in-place.
 	getMetricDatas = compact(getMetricDatas, func(m *model.CloudwatchData) bool {
@@ -271,7 +274,6 @@ func getFilteredMetricDatas(
 				Tags:                   metricTags,
 				Dimensions:             cwMetric.Dimensions,
 				Period:                 m.Period,
-				Integrate:              m.Integrate,
 			})
 		}
 	}
