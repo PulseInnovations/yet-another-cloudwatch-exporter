@@ -127,7 +127,7 @@ func (p *PrometheusCollector) Collect(metrics chan<- prometheus.Metric) {
 	}
 }
 
-func createCounter(metric *PrometheusMetric) prometheus.Metric {
+func createCounter(metric *PrometheusMetric, error5xxRate float64) prometheus.Metric {
 	counterName := *metric.Name + "_count"
 	counterVec, exists := counterVecs[counterName]
 

@@ -187,12 +187,7 @@ var SupportedServices = serviceConfigs{
 			regexp.MustCompile("distribution/(?P<DistributionId>[^/]+)"),
 		},
 		MetricCustomizers: []func([]*model.CloudwatchData) []*model.CloudwatchData{
-			func(cloudwatchDatas []*model.CloudwatchData) []*model.CloudwatchData {
-				// TODO: extract counters for successful and failed requests
-				for _, cd := range cloudwatchDatas {
-				}
-				return cloudwatchDatas
-			},
+			cloudfrontExtractCounters,
 		},
 	},
 	{
@@ -881,4 +876,27 @@ var SupportedServices = serviceConfigs{
 			regexp.MustCompile(":rule/(?P<EventBusName>[^/]+)/(?P<RuleName>[^/]+)$"),
 		},
 	},
+}
+
+func cloudfrontExtractCounters(metrics []*model.CloudwatchData) []*model.CloudwatchData {
+	counters := make([]*model.CloudwatchData, 0, len(metrics))
+
+	requestCounts := make([]*model.CloudwatchData, 0, len(metrics))
+	error5xxRates := make(map[string]float64, len(metrics))
+
+	for _, m := range metrics {
+		if *m.MetricID == "Requests" {
+			requestCounts = append(requestCounts, m)
+		} else if *m.MetricID == "5xxErrorRateAverage" {
+			error5xxRates[*m.ID] = *m.Points[len(m.Points)-1].Average
+		}
+	}
+
+	for _, requestCount := range requestCounts {
+		error5xxRate := error5xxRates[requestCount.Labels["dimension_DistributionId"]]
+		// TODO: newCounters := createCounter(requestCount, error5xxRate)
+		counters = append(counters, newCounters...)
+	}
+
+	return counters
 }
