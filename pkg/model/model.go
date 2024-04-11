@@ -80,6 +80,7 @@ type MetricConfig struct {
 	Delay                  int64
 	NilToZero              bool
 	AddCloudwatchTimestamp bool
+	Integrate              bool
 }
 
 type DimensionsRegexp struct {
@@ -163,6 +164,7 @@ type CloudwatchData struct {
 	Namespace    string
 	Tags         []Tag
 	Dimensions   []Dimension
+	Integrate    bool
 	// GetMetricDataProcessingParams includes necessary fields to run GetMetricData
 	GetMetricDataProcessingParams *GetMetricDataProcessingParams
 

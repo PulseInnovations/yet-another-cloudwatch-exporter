@@ -87,6 +87,7 @@ type Metric struct {
 	Delay                  int64    `yaml:"delay"`
 	NilToZero              *bool    `yaml:"nilToZero"`
 	AddCloudwatchTimestamp *bool    `yaml:"addCloudwatchTimestamp"`
+	Integrate              *bool    `yaml:"integrate"`
 }
 
 type Dimension struct {
@@ -488,6 +489,7 @@ func toModelMetricConfig(metrics []*Metric) []*model.MetricConfig {
 			Delay:                  m.Delay,
 			NilToZero:              aws.BoolValue(m.NilToZero),
 			AddCloudwatchTimestamp: aws.BoolValue(m.AddCloudwatchTimestamp),
+			Integrate:              aws.BoolValue(m.Integrate),
 		})
 	}
 	return ret

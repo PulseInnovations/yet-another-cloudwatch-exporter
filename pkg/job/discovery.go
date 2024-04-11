@@ -183,6 +183,7 @@ func getFilteredMetricDatas(
 				Tags:                      metricTags,
 				GetMetricDataResult:       nil,
 				GetMetricStatisticsResult: nil,
+				Integrate:                 m.Integrate,
 			})
 		}
 	}

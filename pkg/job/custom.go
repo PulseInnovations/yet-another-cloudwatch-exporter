@@ -72,6 +72,7 @@ func getMetricDataForQueriesForCustomNamespace(
 								Delay:     metric.Delay,
 								Statistic: stat,
 							},
+							Integrate: metric.Integrate,
 							MetricMigrationParams: model.MetricMigrationParams{
 								NilToZero:              metric.NilToZero,
 								AddCloudwatchTimestamp: metric.AddCloudwatchTimestamp,

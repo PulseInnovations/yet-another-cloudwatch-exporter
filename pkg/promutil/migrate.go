@@ -89,6 +89,7 @@ func BuildMetrics(results []model.CloudwatchMetricResult, labelsSnakeCase bool, 
 			}
 
 			for _, statistic := range statisticsInCloudwatchData(metric) {
+				integrate := metric.Integrate
 				dataPoint, ts, err := getDatapoint(metric, statistic)
 				if err != nil {
 					return nil, nil, err
@@ -121,6 +122,7 @@ func BuildMetrics(results []model.CloudwatchMetricResult, labelsSnakeCase bool, 
 					Value:            exportedDatapoint,
 					Timestamp:        ts,
 					IncludeTimestamp: metric.MetricMigrationParams.AddCloudwatchTimestamp,
+					Integrate:        integrate,
 				})
 
 			}

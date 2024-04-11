@@ -38,6 +38,7 @@ func runStaticJob(
 				GetMetricDataProcessingParams: nil,
 				GetMetricDataResult:           nil,
 				GetMetricStatisticsResult:     nil,
+				Integrate:                     metric.Integrate,
 			}
 
 			data.GetMetricStatisticsResult = &model.GetMetricStatisticsResult{

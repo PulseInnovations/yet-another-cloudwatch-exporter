@@ -377,6 +377,7 @@ func Test_getFilteredMetricDatas(t *testing.T) {
 					Delay:                  120,
 					NilToZero:              false,
 					AddCloudwatchTimestamp: false,
+					Integrate:              true,
 				},
 			},
 			[]model.CloudwatchData{
@@ -405,6 +406,7 @@ func Test_getFilteredMetricDatas(t *testing.T) {
 						NilToZero:              false,
 						AddCloudwatchTimestamp: false,
 					},
+					Integrate: true,
 				},
 			},
 		},

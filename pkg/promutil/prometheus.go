@@ -96,6 +96,7 @@ type PrometheusMetric struct {
 	Value            float64
 	IncludeTimestamp bool
 	Timestamp        time.Time
+	Integrate        bool
 }
 
 type PrometheusCollector struct {
@@ -119,7 +120,23 @@ func (p *PrometheusCollector) Describe(_ chan<- *prometheus.Desc) {
 func (p *PrometheusCollector) Collect(metrics chan<- prometheus.Metric) {
 	for _, metric := range p.metrics {
 		metrics <- createMetric(metric)
+		if metric.Integrate {
+			metrics <- createCounter(metric)
+		}
 	}
+}
+
+func createCounter(metric *PrometheusMetric) prometheus.Metric {
+	counter := prometheus.NewCounter(prometheus.CounterOpts{
+		Name:        *metric.Name + "_count",
+		Help:        "Help is not implemented yet.",
+		ConstLabels: metric.Labels,
+	})
+	counter.Add(metric.Value)
+	if !metric.IncludeTimestamp {
+		return counter
+	}
+	return prometheus.NewMetricWithTimestamp(metric.Timestamp, counter)
 }
 
 func createMetric(metric *PrometheusMetric) prometheus.Metric {
