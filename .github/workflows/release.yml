@@ -18,7 +18,6 @@ permissions:
   contents: write
 
 jobs:
-<<<<<<< HEAD
   build-binary:
     name: Build binary using goreleaser
     runs-on: ubuntu-latest

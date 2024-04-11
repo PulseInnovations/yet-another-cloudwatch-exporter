@@ -146,7 +146,7 @@ func createCounter(metric *PrometheusMetric) prometheus.Metric {
 
 	counter := counterVec.With(metric.Labels)
 
-	counter.Add(*metric.Value)
+	counter.Add(metric.Value)
 	if !metric.IncludeTimestamp {
 		return counter
 	}
