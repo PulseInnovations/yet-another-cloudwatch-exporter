@@ -43,7 +43,7 @@ jobs:
         run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $DOCKER_REGISTRY_URL
 
       - name: Build and Publish docker image
-        run: docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/nerdswords/yet-another-cloudwatch-exporter:${{github.ref_name}} --build-arg VERSION=${{github.ref_name}} --push .
+        run: docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/pulseinnovations/yet-another-cloudwatch-exporter:${{github.ref_name}} --build-arg VERSION=${{github.ref_name}} --push .
 
       - name: Build && release binaries
         uses: goreleaser/goreleaser-action@v5
